@@ -2,7 +2,7 @@ const userModel = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
+// Register a new user
 const registerUser = async (req, res) => {    
     try {
         const { email, password, role='user' } = req.body;
@@ -23,6 +23,7 @@ const registerUser = async (req, res) => {
     }   
 }
 
+// Login user
 async function loginUser(req, res) {
     try {
         const { email, password } = req.body;
@@ -43,6 +44,7 @@ async function loginUser(req, res) {
     }
 }
 
+// Admin login
 async function loginAdmin(req, res) {
     try {
         const { email, password } = req.body;
@@ -62,6 +64,8 @@ async function loginAdmin(req, res) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }       
 }
+
+// Logout user
 async function logoutUser(req, res) {
     try {
         if (!req.cookies.token) {
@@ -74,11 +78,51 @@ async function logoutUser(req, res) {
     }   
 }
 
+// Check admin dashboard access
+async function checkDashboardAccess(req, res) {
+    try {
+        const token = req.cookies.token; 
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+        res.status(200).json({ message: 'Access granted to admin dashboard' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
 
+// test db connection and user list, remove later
+async function checkDB(req,res){
+    res.send(await userModel.find());
+}
+
+// Check seller dashboard access
+async function checkSellerDashboardAccess(req, res) {
+    try {
+        const token = req.cookies.token;    
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role !== 'seller') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+        res.status(200).json({ message: 'Access granted to seller dashboard' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+}
 
 module.exports = {
     registerUser,
     loginUser,
     loginAdmin,
-    logoutUser
+    logoutUser,
+    checkDashboardAccess,
+    checkSellerDashboardAccess,
+    checkDB
 }
