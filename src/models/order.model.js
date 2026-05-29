@@ -28,6 +28,11 @@ const orderSchema = new mongoose.Schema({
         required: true,
         min: 1,
       },
+      seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
     },
   ],
   totalAmount: {

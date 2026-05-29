@@ -58,7 +58,11 @@ const productSchema = new mongoose.Schema({
   },
   comments: [
     {
-      user: {
+      username: {
+        type: String,
+        required: true,
+      },
+      userid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },

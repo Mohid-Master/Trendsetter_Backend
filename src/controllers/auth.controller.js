@@ -5,15 +5,17 @@ const jwt = require('jsonwebtoken');
 // Register a new user
 const registerUser = async (req, res) => {    
     try {
-        const { email, password, role='user' } = req.body;
-        console.log(req.body);
+        const { name, email, password, role='user', phoneNumber, address, city, state } = req.body;
+        if(!name || !email || !password || !phoneNumber || !address || !city || !state){
+            return res.status(400).json({ message: 'All fields are required' });
+        }
         // Check if user already exists
         const existingUser = await userModel.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }   
         // Create new user
-        const newUser = await userModel.create({ email, password, role });
+        const newUser = await userModel.create({ name, email, password, role, phoneNumber, address, city, state });
         // await newUser.save();
         const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET);
         res.cookie("token",token);

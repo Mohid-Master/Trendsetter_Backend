@@ -11,6 +11,7 @@ const isAuthenticated = (req, res, next) => {
     // Decode token once and attach it to the request object
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; 
+    console.log(req.user);
     
     next(); // Pass control to the next function
   } catch (error) {
