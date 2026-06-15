@@ -6,6 +6,7 @@ const router = express.Router();
 
 // user routes
 router.post('/place-order', authMiddleware.isAuthenticated, userController.placeOrder);
+router.post('/cancel-order/:id', authMiddleware.isAuthenticated, userController.cancelOrder);
 router.post('/comment/:id', authMiddleware.isAuthenticated, userController.commentProduct);
 router.post('/like/:id', authMiddleware.isAuthenticated, userController.likeProduct);
 router.get('/orders', authMiddleware.isAuthenticated, userController.getAllOrders);
