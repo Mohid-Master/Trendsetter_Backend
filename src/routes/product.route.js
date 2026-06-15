@@ -7,6 +7,8 @@ const router = express.Router();
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
 // Protected routes for adding, updating, and deleting products - only accessible to authenticated users
+router.get('/seller', authMiddleware.isAuthenticated, authMiddleware.isSeller, productController.getSellerProducts);
+router.get('/seller/:id', authMiddleware.isAuthenticated, productController.getSpecificSellerProducts);
 router.post('/add', authMiddleware.isAuthenticated, authMiddleware.isSeller, productController.addProduct);
 router.post('/update/:id', authMiddleware.isAuthenticated, authMiddleware.isSeller, productController.updateProduct);
 router.delete('/delete/:id', authMiddleware.isAuthenticated, authMiddleware.isSeller, productController.deleteProduct);

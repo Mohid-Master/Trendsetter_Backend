@@ -28,4 +28,13 @@ const isSeller = (req, res, next) => {
   next();
 };
 
-module.exports = { isAuthenticated, isSeller };
+// Middleware to restrict access to admins only
+const isAdmin = (req, res, next) => {
+  // Enforce role restriction (assumes req.user is set by isAuthenticated)
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden: Admin account required" });
+  }
+  next();
+};
+
+module.exports = { isAuthenticated, isSeller, isAdmin };

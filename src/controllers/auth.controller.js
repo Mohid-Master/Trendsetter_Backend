@@ -30,6 +30,7 @@ async function loginUser(req, res) {
     try {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email });
+        console.log(user);
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -80,51 +81,25 @@ async function logoutUser(req, res) {
     }   
 }
 
-// Check admin dashboard access
-async function checkDashboardAccess(req, res) {
+// update user
+async function updateUser(req, res) {
     try {
-        const token = req.cookies.token; 
-        if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-        res.status(200).json({ message: 'Access granted to admin dashboard' });
+        const updatedUser = await userModel.findByIdAndUpdate(req.user.id, req.body, { new: true });
+        res.status(200).json({ message: 'User updated successfully', user: updatedUser });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
-    }
+    }   
 }
 
-// test db connection and user list, remove later
-async function checkDB(req,res){
-    res.send(await userModel.find());
-}
-
-// Check seller dashboard access
-async function checkSellerDashboardAccess(req, res) {
-    try {
-        const token = req.cookies.token;    
-        if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'seller') {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-        res.status(200).json({ message: 'Access granted to seller dashboard' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-}
 
 module.exports = {
     registerUser,
     loginUser,
     loginAdmin,
     logoutUser,
-    checkDashboardAccess,
-    checkSellerDashboardAccess,
-    checkDB
+    updateUser
 }

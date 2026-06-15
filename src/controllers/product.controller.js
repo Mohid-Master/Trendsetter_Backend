@@ -10,7 +10,25 @@ const addProduct = async (req, res) => {
       ...req.body,
       seller: req.user.id // Provided cleanly by isAuthenticated middleware
     };
+    // demo product
+    /*
+    {
 
+    }
+    */ 
+    const check = await productModel.findOne(
+      {
+        name: productData.name,
+        seller: req.user.id,
+        imageUrl: productData.imageUrl,
+      }
+    );
+    if(!productData.name || !productData.description || !productData.price || !productData.category || !productData.imageUrl || !productData.stock){
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    if(check){
+      return res.status(400).json({ message: "Product already exists" });
+    }
     const newProduct = await productModel.create(productData);
 
     res.status(201).json({ 
@@ -23,7 +41,7 @@ const addProduct = async (req, res) => {
 };
 
 // ==========================================
-// 2. GET ALL PRODUCTS
+// 2a. GET ALL PRODUCTS
 // ==========================================
 const getAllProducts = async (req, res) => {
   try {
@@ -33,6 +51,31 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// ==========================================
+// 2b. GET ALL PRODUCTS OF A SEllER for a seller
+// ==========================================
+const getSellerProducts = async (req, res) => {
+  try {
+    const products = await productModel.find({ seller: req.user.id });
+    res.status(200).json({ products });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ==========================================
+// 2b. GET ALL PRODUCTS OF A SEllER for a user
+// ==========================================
+const getSpecificSellerProducts = async (req, res) => { 
+  try {
+    const products = await productModel.find({ seller: req.params.id });
+    res.status(200).json({ products });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 
 // ==========================================
 // 3. GET PRODUCT BY ID
@@ -104,6 +147,8 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   addProduct,
   getAllProducts,
+  getSellerProducts,
+  getSpecificSellerProducts,
   getProductById,
   updateProduct,
   deleteProduct,
